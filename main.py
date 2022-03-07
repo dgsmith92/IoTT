@@ -191,38 +191,38 @@ if translator and client:
 
 if CoAP_Enable:
     if translator:
-        from translators.CoAP import outbound as COAP_OUTPUT
-        from translators.CoAP import inbound as COAP_INPUT
+        from translators.CoAP import Outbound as COAP_OUTPUT
+        from translators.CoAP import Inbound as COAP_INPUT
     elif client:
-        from clients.CoAP import provider as COAP_OUTPUT
-        from clients.CoAP import consumer as COAP_INPUT
+        from clients.CoAP import Provider as COAP_OUTPUT
+        from clients.CoAP import Consumer as COAP_INPUT
     CoAP_Input = COAP_INPUT()
     CoAP_Output = COAP_OUTPUT()
 if MQTT_Enable:
     if translator:
-        from translators.MQTT import outbound as MQTT_OUTPUT
-        from translators.MQTT import inbound as MQTT_INPUT
+        from translators.MQTT import Outbound as MQTT_OUTPUT
+        from translators.MQTT import Inbound as MQTT_INPUT
     elif client:
-        from clients.MQTT import provider as MQTT_OUTPUT
-        from clients.MQTT import consumer as MQTT_INPUT
+        from clients.MQTT import Provider as MQTT_OUTPUT
+        from clients.MQTT import Consumer as MQTT_INPUT
     MQTT_Input = MQTT_INPUT()
     MQTT_Output = MQTT_OUTPUT()
 if AMQP_Enable:
     if translator:
-        from translators.AMQP import outbound as AMQP_OUTPUT
-        from translators.AMQP import inbound as AMQP_INPUT
+        from translators.AMQP import Outbound as AMQP_OUTPUT
+        from translators.AMQP import Inbound as AMQP_INPUT
     elif client:
-        from clients.AMQP import provider as AMQP_OUTPUT
-        from clients.AMQP import consumer as AMQP_INPUT
+        from clients.AMQP import Provider as AMQP_OUTPUT
+        from clients.AMQP import Consumer as AMQP_INPUT
     AMQP_Input = AMQP_INPUT()
     AMQP_Output = AMQP_OUTPUT()
 if HTTP_Enable:
     if translator:
-        from translators.HTTP import outbound as HTTP_OUTPUT
+        from translators.HTTP import Outbound as HTTP_OUTPUT
         from translators.HTTP import inbound as HTTP_INPUT
     elif client:
-        from clients.HTTP import provider as HTTP_OUTPUT
-        from clients.HTTP import consumer as HTTP_INPUT  # TODO Find HTTP/S library that provides needed features for this project
+        from clients.HTTP import Provider as HTTP_OUTPUT
+        from clients.HTTP import Consumer as HTTP_INPUT  # TODO Find HTTP/S library that provides needed features for this project
     HTTP_Input = HTTP_INPUT()
     HTTP_Output = HTTP_OUTPUT()
 if any([CoAP_Provide, MQTT_Provide, AMQP_Provide, HTTP_Provide]):

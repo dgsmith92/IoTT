@@ -1,6 +1,14 @@
-def inbound():  # TODO create code for CoAP inbound translation
-    pass
+class Inbound:  # TODO create code for CoAP inbound translation
+    def __init__(self):
+        pass
+
+    def run(self):
+        pass
 
 
-def outbound():  # TODO create code for CoAP outbound translation
-    pass
+class Outbound:  # TODO create code for CoAP outbound translation
+    def __init__(self):
+        pass
+
+    def run(self):
+        pass

@@ -1,6 +1,15 @@
-def consumer():  # TODO create code for HTTP Consumption as a client
-    pass
+class Consumer:  # TODO create code for HTTP Consumption as a client
+    def __init__(self):
+        pass
+
+    def run(self):
+        pass
 
 
-def provider():  # TODO create code for HTTP Provision as a client
-    pass
+class Provider:  # TODO create code for HTTP Provision as a client
+    def __init__(self):
+        pass
+
+    def run(self):
+        pass
+
