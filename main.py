@@ -182,14 +182,49 @@ if debug:
     print('Importing packages')
 
 # Perform imports, initialise variables and any one time code before triggering async event loop
+if not (translator or client):
+    print("--ERROR neither client or translator role specified. Quitting.")
+    quit(1)
+if translator and client:
+    print("--ERROR both client and translator role specified. Quitting.")
+    quit(1)
+
 if CoAP_Enable:
-    import aiocoap
+    if translator:
+        from translators.CoAP import outbound as COAP_OUTPUT
+        from translators.CoAP import inbound as COAP_INPUT
+    elif client:
+        from clients.CoAP import provider as COAP_OUTPUT
+        from clients.CoAP import consumer as COAP_INPUT
+    CoAP_Input = COAP_INPUT()
+    CoAP_Output = COAP_OUTPUT()
 if MQTT_Enable:
-    import paho
+    if translator:
+        from translators.MQTT import outbound as MQTT_OUTPUT
+        from translators.MQTT import inbound as MQTT_INPUT
+    elif client:
+        from clients.MQTT import provider as MQTT_OUTPUT
+        from clients.MQTT import consumer as MQTT_INPUT
+    MQTT_Input = MQTT_INPUT()
+    MQTT_Output = MQTT_OUTPUT()
 if AMQP_Enable:
-    pass
+    if translator:
+        from translators.AMQP import outbound as AMQP_OUTPUT
+        from translators.AMQP import inbound as AMQP_INPUT
+    elif client:
+        from clients.AMQP import provider as AMQP_OUTPUT
+        from clients.AMQP import consumer as AMQP_INPUT
+    AMQP_Input = AMQP_INPUT()
+    AMQP_Output = AMQP_OUTPUT()
 if HTTP_Enable:
-    pass  # TODO Find HTTP/S library that provides needed features for this project
+    if translator:
+        from translators.HTTP import outbound as HTTP_OUTPUT
+        from translators.HTTP import inbound as HTTP_INPUT
+    elif client:
+        from clients.HTTP import provider as HTTP_OUTPUT
+        from clients.HTTP import consumer as HTTP_INPUT  # TODO Find HTTP/S library that provides needed features for this project
+    HTTP_Input = HTTP_INPUT()
+    HTTP_Output = HTTP_OUTPUT()
 if any([CoAP_Provide, MQTT_Provide, AMQP_Provide, HTTP_Provide]):
     provider = True
     from gpiozero import CPUTemperature
