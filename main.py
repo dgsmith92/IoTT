@@ -6,7 +6,7 @@ from sys import argv
 
 
 # Set location for any default files
-defaultConfig = "config_server.json"
+defaultConfig = "config_client.json"
 
 # Setup argument parser to accept overrides given in the command line
 parser = argparse.ArgumentParser(description='TODO add description')
@@ -47,6 +47,10 @@ except FileNotFoundError:
     exit()
 
 debug = args.debug
+
+# Initialise variables that are later changed in if statements
+client = False
+translator = False
 
 if not (args.configFile or exists(defaultConfig)):
     print("-- No config specified and no default found. Using built in default --")
@@ -97,6 +101,13 @@ else:
             else:
                 print('--WARNING\tInvalid Protocol name found in config file. Skipping this protocol. If this is '
                       'unexpected check the configuration and consider restarting the program.')
+    if role == "Client":
+        client = True
+    elif role == "Translator":
+        translator = True
+    if config['debugPrint']:
+        debug = True
+        print('debug enabled by config file')
 # TODO process and apply override arguments
 if len(argv) == 1:  # If True then no options given, skip checking which overrides have been selected for efficiency
     if debug:
@@ -107,3 +118,12 @@ else:  # At least one override has been given (inclusive of config files), find 
 # TODO import correct packages for given options
 if debug:
     print('Importing packages')
+if CoAP_Enable:
+    import aiocoap
+if MQTT_Enable:
+    import paho
+if AMQP_Enable:
+    pass
+if HTTP_Enable:
+    pass
+
