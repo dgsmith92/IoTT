@@ -35,6 +35,6 @@
         }
     }
   ],
-  "debugPrint": false,
+  "debugPrint": true,
   "debugLog": false
 }

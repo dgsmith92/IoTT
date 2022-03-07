@@ -1,5 +1,5 @@
 {
-  "role": "Server",
+  "role": "Client",
   "translatorAddress": "10.0.10.1",
   "protocols": [
     {
