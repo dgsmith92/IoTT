@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="bcbc7d5c-a1db-4919-ae1f-5355c262f249" name="10.0.10.3">
+        <fileTransfer rootFolder="/home/pi/IoTT" accessType="SFTP" host="10.0.10.3" port="22" sshConfigId="c40c88c6-434e-4c4a-9257-720e23ecb331" sshConfig="pi@10.0.10.3:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="466d29b3-1360-4925-9fe1-5ce2f2bc859a" name="10.0.10.4">
+        <fileTransfer rootFolder="/home/pi/IoTT" accessType="SFTP" host="10.0.10.4" port="22" sshConfigId="8c70f0bc-b1e0-4e79-b75e-10477af8329d" sshConfig="pi@10.0.10.4:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="66d7a110-94d8-4e07-b8f4-209a13f4b531" name="10.0.10.1">
+        <fileTransfer rootFolder="/home/pi/IoTT" accessType="SFTP" host="10.0.10.1" port="22" sshConfigId="e90715eb-1c91-458b-b836-117aa670878a" sshConfig="pi@10.0.10.1:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="ee2d1b87-f218-40b4-a50e-9dbb7d3a3f4c" name="10.0.10.2">
+        <fileTransfer rootFolder="/home/pi/IoTT" accessType="SFTP" host="10.0.10.2" port="22" sshConfigId="25bb3523-cb42-4ee8-90f2-4c2feb216964" sshConfig="pi@10.0.10.2:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

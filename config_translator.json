@@ -1,0 +1,40 @@
+{
+  "role": "Translator",
+  "translatorAddress": "10.0.10.1",
+  "protocols": [
+    {
+      "name": "CoAP",
+      "enabled": true,
+      "options":
+        {
+          "observeSupport": true
+        }
+    },
+    {
+      "name": "MQTT",
+      "enabled": true,
+      "options":
+        {
+          "brokerAddress": "10.0.10.1"
+        }
+    },
+    {
+      "name": "AMQP",
+      "enabled": true,
+      "options":
+        {
+          "exchangeAddress": "10.0.10.1"
+        }
+    },
+    {
+      "name": "HTTP",
+      "enabled": true,
+      "options":
+        {
+          "HTTPS": false
+        }
+    }
+  ],
+  "debugPrint": false,
+  "debugLog": false
+}
