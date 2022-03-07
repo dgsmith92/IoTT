@@ -3,6 +3,7 @@ import json
 import argparse
 from os.path import exists
 from sys import argv
+import asyncio
 
 
 # Set location for any default files
@@ -104,7 +105,7 @@ else:
             print("Using default config")
         configFile = open(defaultConfig)
 
-    # TODO get values from config file in use - Finish me
+    # TODO get values from config file in use - Confirm all cases are covered
     config = json.load(configFile)
     if config['debugPrint']:
         debug = True
@@ -179,6 +180,8 @@ else:  # At least one override has been given (inclusive of config files), find 
 # TODO import correct packages for given options
 if debug:
     print('Importing packages')
+
+# Perform imports, initialise variables and any one time code before triggering async event loop
 if CoAP_Enable:
     import aiocoap
 if MQTT_Enable:
