@@ -68,6 +68,8 @@ HTTP_Consume = False
 HTTP_Provide = False
 MQTT_brokerAddress = ""
 AMQP_exchangeAddress = ""
+provider = False
+consumer = False
 
 
 if not (args.configFile or exists(defaultConfig)):
@@ -88,6 +90,8 @@ if not (args.configFile or exists(defaultConfig)):
     HTTPS_Only = False
     HTTP_Consume = False
     HTTP_Provide = False
+    MQTT_brokerAddress = "10.0.10.1"
+    AMQP_exchangeAddress = "10.0.10.1"
 
 else:
     if args.configFile:
@@ -182,5 +186,10 @@ if MQTT_Enable:
 if AMQP_Enable:
     pass
 if HTTP_Enable:
-    pass
+    pass  # TODO Find HTTP/S library that provides needed features for this project
+if any([CoAP_Provide, MQTT_Provide, AMQP_Provide, HTTP_Provide]):
+    provider = True
+    from gpiozero import CPUTemperature
+    temperature = CPUTemperature()
+
 
