@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95e66a15-c946-4eef-a965-e5a5fc6b2ec1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/config_server.json" beforeDir="false" afterPath="$PROJECT_DIR$/config_client.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config_translator.json" beforeDir="false" afterPath="$PROJECT_DIR$/config_translator.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Python.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Python.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config_client.json" beforeDir="false" afterPath="$PROJECT_DIR$/config_client.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -93,6 +95,9 @@
       <workItem from="1645712033492" duration="13942000" />
       <workItem from="1645798666675" duration="1221000" />
       <workItem from="1646590910114" duration="3350000" />
+      <workItem from="1646614890530" duration="358000" />
+      <workItem from="1646615300021" duration="127000" />
+      <workItem from="1646642029861" duration="2089000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <created>1646612648950</created>

@@ -8,7 +8,9 @@
       "port": null,
       "options":
         {
-          "observeSupport": true
+          "observeSupport": true,
+          "consume": false,
+          "provide": true
         }
     },
     {
@@ -16,7 +18,9 @@
       "enabled": true,
       "options":
         {
-          "brokerAddress": "10.0.10.1"
+          "brokerAddress": "10.0.10.1",
+          "consume": true,
+          "provide": false
         }
     },
     {
@@ -24,7 +28,9 @@
       "enabled": false,
       "options":
         {
-          "exchangeAddress": "10.0.10.1"
+          "exchangeAddress": "10.0.10.1",
+          "consume": false,
+          "provide": false
         }
     },
     {
@@ -32,10 +38,13 @@
       "enabled": false,
       "options":
         {
-          "HTTPS": false
+          "HTTPS": false,
+          "HTTPSOnly": false,
+          "consume": false,
+          "provide": false
         }
     }
   ],
-  "debugPrint": false,
+  "debugPrint": true,
   "debugLog": false
 }
