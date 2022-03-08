@@ -5,15 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95e66a15-c946-4eef-a965-e5a5fc6b2ec1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/clients/AMQP.py" beforeDir="false" afterPath="$PROJECT_DIR$/clients/AMQP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clients/CoAP.py" beforeDir="false" afterPath="$PROJECT_DIR$/clients/CoAP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clients/HTTP.py" beforeDir="false" afterPath="$PROJECT_DIR$/clients/HTTP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clients/MQTT.py" beforeDir="false" afterPath="$PROJECT_DIR$/clients/MQTT.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config_client.json" beforeDir="false" afterPath="$PROJECT_DIR$/config_client.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/translators/AMQP.py" beforeDir="false" afterPath="$PROJECT_DIR$/translators/AMQP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/translators/CoAP.py" beforeDir="false" afterPath="$PROJECT_DIR$/translators/CoAP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/translators/HTTP.py" beforeDir="false" afterPath="$PROJECT_DIR$/translators/HTTP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/translators/MQTT.py" beforeDir="false" afterPath="$PROJECT_DIR$/translators/MQTT.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,7 +101,8 @@
       <workItem from="1646614890530" duration="358000" />
       <workItem from="1646615300021" duration="127000" />
       <workItem from="1646642029861" duration="2846000" />
-      <workItem from="1646678663690" duration="3244000" />
+      <workItem from="1646678663690" duration="3453000" />
+      <workItem from="1646683982883" duration="2299000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <created>1646612648950</created>
@@ -150,7 +146,14 @@
       <option name="project" value="LOCAL" />
       <updated>1646680566269</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Switched style of imported modules to object-oriented. This allows each module to have a once run constructor and a run method.">
+      <created>1646682013272</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1646682013272</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -163,7 +166,8 @@
     <MESSAGE value="Added CPU temperature measurement for raspi&#10;Added consumer/provider globals independent of protocol specifics" />
     <MESSAGE value="Fleshed out comments" />
     <MESSAGE value="Added placeholder translator and client modules. Added conditional imports for these." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added placeholder translator and client modules. Added conditional imports for these." />
+    <MESSAGE value="Switched style of imported modules to object-oriented. This allows each module to have a once run constructor and a run method." />
+    <option name="LAST_COMMIT_MESSAGE" value="Switched style of imported modules to object-oriented. This allows each module to have a once run constructor and a run method." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Python$main_local.coverage" NAME="main_local Coverage Results" MODIFIED="1645757208154" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

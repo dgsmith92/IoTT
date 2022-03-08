@@ -225,9 +225,11 @@ if HTTP_Enable:
         from clients.HTTP import Consumer as HTTP_INPUT  # TODO Find HTTP/S library that provides needed features for this project
     HTTP_Input = HTTP_INPUT()
     HTTP_Output = HTTP_OUTPUT()
+if translator:
+    import translators.core as core
+if client:
+    import clients.core as core
 if any([CoAP_Provide, MQTT_Provide, AMQP_Provide, HTTP_Provide]):
     provider = True
     from gpiozero import CPUTemperature
     temperature = CPUTemperature()
-
-

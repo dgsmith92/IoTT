@@ -10,7 +10,8 @@
         {
           "observeSupport": true,
           "consume": false,
-          "provide": true
+          "provide": true,
+          "CoIoTSupport": false
         }
     },
     {
