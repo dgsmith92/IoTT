@@ -7,8 +7,6 @@ C
 clients/CoAP.py,d\6\d69f6c87f4ca58a78c9e7046dff3d9814a7c34c5
 ?
 clients/AMQP.py,6\a\6a1733c6fa667eae6bd61304356b48419a194b4a
-?
-clients/HTTP.py,2\c\2cf1e29e1ea4db7d0c80427c18e88ce96dcaa82a
 C
 translators/MQTT.py,9\f\9fbb1b20ae3a11a80a4cba93ebc80aa0ad2e1bd2
 C

@@ -9,7 +9,7 @@
       "options":
         {
           "observeSupport": true,
-          "consume": false,
+          "consume": true,
           "provide": true,
           "CoIoTSupport": false
         }

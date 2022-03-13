@@ -4,6 +4,144 @@ import argparse
 from os.path import exists
 from sys import argv
 import asyncio
+# import paho
+from aiocoap import Message, Context, Code, resource, error
+import aiocoap
+import socket
+from gpiozero import CPUTemperature
+
+
+def get_ip_address():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.connect(("192.168.0.10", 80))  # Forces it to find a valid route on the 192.168.0.0/24 subnet rather than the class A c2 subnet
+    return sock.getsockname()[0]
+
+
+class Temperature():
+
+    def __init__(self):
+        self.temperature = CPUTemperature()
+
+    async def render_get(self):
+        payload = await self.temperature.temperature.encode('ascii')
+        return Message(payload=payload)
+
+    def render_put(self):
+        raise error.MethodNotAllowed
+
+
+class Translator:
+
+    def __init__(self, port):
+        self.port = port
+
+
+class CoapTranslator(Translator):
+    def __init__(self, port):
+        super().__init__(port)
+        self.site = resource.Site()
+        self.protocol = Context.create_server_context(self.site, bind=(get_ip_address(), self.port))
+
+    async def AddResource(self, new_resource, uri):
+        await self.site.add_resource(path=[uri], resource=new_resource)
+
+    async def RemoveResource(self, path):
+        await self.site.remove_resource(path)
+
+    async def sendMessage(self, method, dest_uri):
+        if method == "GET":
+            request = Message(code=Code.GET, uri=dest_uri)
+            try:
+                response = await self.protocol.request(request).response
+            except Exception as e:
+                print('Failed to fetch resource:')
+                print(e)
+            else:
+                print('Result: %s\n%r'%(response.code, response.payload))
+        elif method == "POST":
+            pass
+        elif method == "PUT":
+            pass
+        elif method == "DELETE":
+            pass
+        else:
+            if debug:
+                print("Invalid CoAP request type. GET, POST, PUT and DELETE are valid.")
+
+    async def respondMessage(self):
+        pass
+
+    async def listen(self):
+        pass
+
+
+class MqttTranslator(Translator):
+    pass
+
+
+class AmqpTranslator(Translator):
+    pass
+
+
+class HttpTranslator(Translator):
+    pass
+
+
+class Client:
+
+    def __init__(self, port):
+        self.port = port
+
+
+class CoapClient(Client):
+    def __init__(self, port=5683):
+        super().__init__(port)
+        self.site = resource.Site()
+        self.protocol = Context.create_server_context(self.site, bind=(get_ip_address(), self.port))
+
+    async def AddResource(self, new_resource, uri):
+        await self.site.add_resource(path=[uri], resource=new_resource)
+
+    async def RemoveResource(self, path):
+        await self.site.remove_resource(path)
+
+    async def sendMessage(self, method, dest_uri):
+        if method == "GET":
+            request = Message(code=Code.GET, uri=dest_uri)
+            try:
+                response = await self.protocol.request(request).response
+            except Exception as e:
+                print('Failed to fetch resource:')
+                print(e)
+            else:
+                print('Result: %s\n%r'%(response.code, response.payload))
+        elif method == "POST":
+            pass
+        elif method == "PUT":
+            pass
+        elif method == "DELETE":
+            pass
+        else:
+            if debug:
+                print("Invalid CoAP request type. GET, POST, PUT and DELETE are valid.")
+
+    async def respondMessage(self):
+        pass
+
+    async def listen(self):
+        pass
+
+
+class MqttClient(Client):
+    pass
+
+
+class AmqpClient(Client):
+    pass
+
+
+class HttpClient(Client):
+    pass
 
 
 # Set location for any default files
@@ -38,6 +176,7 @@ parser.add_argument('--AMQPExchangeAddress', dest='amqpAddress', type=str,
 parser.add_argument('--enableMQTT', dest='mqttEnable', type=bool, choices=[True, False], help='Enables MQTT')
 parser.add_argument('--MQTTBrokerAddress', dest='mqttAddress', type=str,
                     help='An override IP address for an AMQP Exchange server to use.')
+parser.add_argument('-X', dest='x', action='store_true', default=False)
 
 # TODO Add override arguments
 args = None
@@ -189,47 +328,16 @@ if translator and client:
     print("--ERROR both client and translator role specified. Quitting.")
     quit(1)
 
-if CoAP_Enable:
-    if translator:
-        from translators.CoAP import Outbound as COAP_OUTPUT
-        from translators.CoAP import Inbound as COAP_INPUT
-    elif client:
-        from clients.CoAP import Provider as COAP_OUTPUT
-        from clients.CoAP import Consumer as COAP_INPUT
-    CoAP_Input = COAP_INPUT()
-    CoAP_Output = COAP_OUTPUT()
-if MQTT_Enable:
-    if translator:
-        from translators.MQTT import Outbound as MQTT_OUTPUT
-        from translators.MQTT import Inbound as MQTT_INPUT
-    elif client:
-        from clients.MQTT import Provider as MQTT_OUTPUT
-        from clients.MQTT import Consumer as MQTT_INPUT
-    MQTT_Input = MQTT_INPUT()
-    MQTT_Output = MQTT_OUTPUT()
-if AMQP_Enable:
-    if translator:
-        from translators.AMQP import Outbound as AMQP_OUTPUT
-        from translators.AMQP import Inbound as AMQP_INPUT
-    elif client:
-        from clients.AMQP import Provider as AMQP_OUTPUT
-        from clients.AMQP import Consumer as AMQP_INPUT
-    AMQP_Input = AMQP_INPUT()
-    AMQP_Output = AMQP_OUTPUT()
-if HTTP_Enable:
-    if translator:
-        from translators.HTTP import Outbound as HTTP_OUTPUT
-        from translators.HTTP import inbound as HTTP_INPUT
-    elif client:
-        from clients.HTTP import Provider as HTTP_OUTPUT
-        from clients.HTTP import Consumer as HTTP_INPUT  # TODO Find HTTP/S library that provides needed features for this project
-    HTTP_Input = HTTP_INPUT()
-    HTTP_Output = HTTP_OUTPUT()
-if translator:
-    import translators.core as core
-if client:
-    import clients.core as core
-if any([CoAP_Provide, MQTT_Provide, AMQP_Provide, HTTP_Provide]):
-    provider = True
-    from gpiozero import CPUTemperature
-    temperature = CPUTemperature()
+protocols = []
+
+#
+# if any([CoAP_Provide, MQTT_Provide, AMQP_Provide, HTTP_Provide]):
+#     provider = True
+#     from gpiozero import CPUTemperature
+#     temperature = CPUTemperature()
+
+coapClient = CoapClient()
+temp = Temperature()
+coapClient.AddResource(temp, 'temp')
+if args.x:
+    coapClient.sendMessage('GET', 'temp')

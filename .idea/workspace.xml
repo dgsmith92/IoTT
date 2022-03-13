@@ -5,10 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95e66a15-c946-4eef-a965-e5a5fc6b2ec1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/Python.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Python.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clients/AMQP.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/clients/CoAP.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/clients/HTTP.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/clients/MQTT.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/config_client.json" beforeDir="false" afterPath="$PROJECT_DIR$/config_client.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/translators/AMQP.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/translators/CoAP.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/translators/HTTP.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/translators/MQTT.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,6 +114,10 @@
       <workItem from="1646642029861" duration="2846000" />
       <workItem from="1646678663690" duration="3453000" />
       <workItem from="1646683982883" duration="2299000" />
+      <workItem from="1646843826737" duration="595000" />
+      <workItem from="1647011009002" duration="595000" />
+      <workItem from="1647044847553" duration="3097000" />
+      <workItem from="1647132039636" duration="11279000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <created>1646612648950</created>
