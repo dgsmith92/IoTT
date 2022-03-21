@@ -17,7 +17,7 @@ def get_ip_address():
     return sock.getsockname()[0]
 
 
-class Temperature():
+class Temperature(resource.Resource):
 
     def __init__(self):
         self.temperature = CPUTemperature()
@@ -40,7 +40,7 @@ class CoapTranslator(Translator):
     def __init__(self, port):
         super().__init__(port)
         self.site = resource.Site()
-        self.protocol = Context.create_server_context(self.site, bind=(get_ip_address(), self.port))
+        self.protocol = Context.create_server_context(self.site)
 
     async def AddResource(self, new_resource, uri):
         await self.site.add_resource(path=[uri], resource=new_resource)
@@ -96,25 +96,45 @@ class Client:
 class CoapClient(Client):
     def __init__(self, port=5683):
         super().__init__(port)
-        self.site = resource.Site()
-        self.protocol = Context.create_server_context(self.site, bind=(get_ip_address(), self.port))
+        self.site = None
+        self.protocol = None
 
-    async def AddResource(self, new_resource, uri):
-        await self.site.add_resource(path=[uri], resource=new_resource)
+    @classmethod
+    async def create(cls, port=5683, site=None):
+        self = CoapClient(port)
+        self.protocol = None
+        if site:
+            self.site = site
+        else:
+            self.site = resource.Site()
+        self.protocol = await Context.create_server_context(self.site, bind=(get_ip_address(), self.port))
+        return self
+
+    async def start(self):
+        self.protocol = await Context.create_server_context(self.site, bind=(get_ip_address(), self.port))
+        await asyncio.get_running_loop().create_future()
+
+    def AddResource(self, new_resource, uri):
+        self.site.add_resource(path=[uri], resource=new_resource)
+        if debug:
+            print("Added resource")
 
     async def RemoveResource(self, path):
         await self.site.remove_resource(path)
 
+    async def listenIndefinitely(self):
+        await asyncio.get_running_loop().create_future()
+
     async def sendMessage(self, method, dest_uri):
         if method == "GET":
             request = Message(code=Code.GET, uri=dest_uri)
-            try:
-                response = await self.protocol.request(request).response
-            except Exception as e:
-                print('Failed to fetch resource:')
-                print(e)
-            else:
-                print('Result: %s\n%r'%(response.code, response.payload))
+            # try:
+            response = await self.protocol.request(request).response
+            # except Exception as e:
+            #     print('Failed to fetch resource:')
+            #     print(e)
+            # else:
+            print('Result: {}\n{}'.format(response.code, response.payload))
         elif method == "POST":
             pass
         elif method == "PUT":
@@ -144,6 +164,20 @@ class HttpClient(Client):
     pass
 
 
+async def main():
+    siteRoot = resource.Site()
+    temp = Temperature()
+    siteRoot.add_resource(['temp'], temp)
+
+    coapClient = await CoapClient.create(site=siteRoot)
+
+    # asyncio.run(coapClient.AddResource(temp, 'temp'))
+    if args.x:
+        await coapClient.sendMessage('GET', 'coap://192.168.0.103/temp')
+        if debug:
+            print("Test")
+    else:
+        await asyncio.get_running_loop().create_future()
 # Set location for any default files
 defaultConfig = "config_client.json"
 
@@ -336,8 +370,4 @@ protocols = []
 #     from gpiozero import CPUTemperature
 #     temperature = CPUTemperature()
 
-coapClient = CoapClient()
-temp = Temperature()
-coapClient.AddResource(temp, 'temp')
-if args.x:
-    coapClient.sendMessage('GET', 'temp')
+asyncio.run(main())
