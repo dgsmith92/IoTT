@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95e66a15-c946-4eef-a965-e5a5fc6b2ec1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/translators/CoAP_directTest_clientGET.py" beforeDir="false" afterPath="$PROJECT_DIR$/translators/CoAP_directTest_clientGET.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -184,7 +181,7 @@
       <workItem from="1647218636132" duration="6013000" />
       <workItem from="1647303541235" duration="9147000" />
       <workItem from="1647529133131" duration="2156000" />
-      <workItem from="1647870018715" duration="5810000" />
+      <workItem from="1647870018715" duration="6166000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <created>1646612648950</created>
@@ -242,7 +239,14 @@
       <option name="project" value="LOCAL" />
       <updated>1647145476710</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Client now working to request temperature. Blank binary response returned, need to correct something server side.">
+      <created>1647877986227</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1647877986227</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -268,7 +272,8 @@
     <MESSAGE value="Added placeholder translator and client modules. Added conditional imports for these." />
     <MESSAGE value="Switched style of imported modules to object-oriented. This allows each module to have a once run constructor and a run method." />
     <MESSAGE value="Restructure. Added parent client and translator classes and began creating protocol specific child classes. Currently, not functional, some asyncio issues with coap server. Running reproduces same error each time. Needs further research and understanding." />
-    <option name="LAST_COMMIT_MESSAGE" value="Restructure. Added parent client and translator classes and began creating protocol specific child classes. Currently, not functional, some asyncio issues with coap server. Running reproduces same error each time. Needs further research and understanding." />
+    <MESSAGE value="Client now working to request temperature. Blank binary response returned, need to correct something server side." />
+    <option name="LAST_COMMIT_MESSAGE" value="Client now working to request temperature. Blank binary response returned, need to correct something server side." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Python$main_local.coverage" NAME="main_local Coverage Results" MODIFIED="1645757208154" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

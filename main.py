@@ -22,8 +22,8 @@ class Temperature(resource.Resource):
     def __init__(self):
         self.temperature = CPUTemperature()
 
-    async def render_get(self):
-        payload = await self.temperature.temperature.encode('ascii')
+    async def render_get(self, request):
+        payload = str(self.temperature.temperature).encode('ascii')
         return Message(payload=payload)
 
     def render_put(self):
