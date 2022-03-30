@@ -8,7 +8,8 @@ import paho
 from aiocoap import Message, Context, Code, resource, error
 import aiocoap
 import socket
-import amqp
+import aio_pika
+import aio_pika.abc
 from aiohttp import web
 from gpiozero import CPUTemperature
 import aiohttp
@@ -105,9 +106,6 @@ class Client:
     def __init__(self, port):
         self.port = port
 
-    def request(self, method, dest_uri):
-        pass
-
 
 class CoapClient(Client):
     def __init__(self, port=5683):
@@ -173,7 +171,45 @@ class MqttClient(Client):
 
 
 class AmqpClient(Client):
-    pass
+
+    def __init__(self, port):
+        super().__init__(port)
+        self.connection = None
+
+    @classmethod
+    async def create(cls, exchange, port=80):
+        self = AmqpClient(port)
+        self.connection = await aio_pika.connect_robust(exchange)
+
+        return self
+
+    def request(self, method, dest_uri):
+        pass
+
+    async def publish(self, queue_name, payload):
+        channel: aio_pika.abc.AbstractChannel = await self.connection.channel()
+        await channel.default_exchange.publish(aio_pika.Message(body=payload.encode()), routing_key=queue_name)
+
+    async def add_queue(self, queue_name):
+        pass
+
+    def remove_queue(self, queue_name):
+        pass
+
+    async def subscribe(self, queue_name):
+        channel: aio_pika.abc.AbstractChannel = await self.connection.channel()
+        queue: aio_pika.abc.AbstractQueue = await channel.declare_queue(queue_name, auto_delete=True)
+
+        async with queue.iterator() as queue_iterator:
+            async for message in queue_iterator:
+                async with message.process():
+                    print(message.body)
+
+    def unsubscribe(self, queue_name):
+        pass
+
+    async def close(self):
+        await self.connection.close()
 
 
 class HttpClient(Client):

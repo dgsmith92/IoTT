@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95e66a15-c946-4eef-a965-e5a5fc6b2ec1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/wheelhouse/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -194,7 +193,7 @@
       <workItem from="1648478345586" duration="596000" />
       <workItem from="1648486175622" duration="716000" />
       <workItem from="1648551644089" duration="1189000" />
-      <workItem from="1648673409948" duration="427000" />
+      <workItem from="1648673409948" duration="5068000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <created>1646612648950</created>
@@ -266,7 +265,14 @@
       <option name="project" value="LOCAL" />
       <updated>1647878332501</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Improved error handling, removed redundant commented out code">
+      <created>1648673920020</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1648673920020</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -294,7 +300,8 @@
     <MESSAGE value="Restructure. Added parent client and translator classes and began creating protocol specific child classes. Currently, not functional, some asyncio issues with coap server. Running reproduces same error each time. Needs further research and understanding." />
     <MESSAGE value="Client now working to request temperature. Blank binary response returned, need to correct something server side." />
     <MESSAGE value="Server fixed, CoAP client - server pair functional for GET requests" />
-    <option name="LAST_COMMIT_MESSAGE" value="Server fixed, CoAP client - server pair functional for GET requests" />
+    <MESSAGE value="Improved error handling, removed redundant commented out code" />
+    <option name="LAST_COMMIT_MESSAGE" value="Improved error handling, removed redundant commented out code" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Python$main_local.coverage" NAME="main_local Coverage Results" MODIFIED="1645757208154" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
