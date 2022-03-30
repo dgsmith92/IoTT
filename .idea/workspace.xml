@@ -5,6 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95e66a15-c946-4eef-a965-e5a5fc6b2ec1" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/wheelhouse/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -20,6 +22,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
@@ -41,17 +48,18 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SONARLINT_PRECOMMIT_ANALYSIS" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/translators" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/wheelhouse" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PythonContentEntriesConfigurable" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="M:\Diss\Code\Python\wheelhouse" />
       <recent name="C:\Users\danie\PycharmProjects\IoTT\translators" />
       <recent name="C:\Users\danie\PycharmProjects\IoTT\clients" />
       <recent name="M:\Diss\Code\Python\Translator" />
@@ -181,7 +189,12 @@
       <workItem from="1647218636132" duration="6013000" />
       <workItem from="1647303541235" duration="9147000" />
       <workItem from="1647529133131" duration="2156000" />
-      <workItem from="1647870018715" duration="6166000" />
+      <workItem from="1647870018715" duration="26370000" />
+      <workItem from="1648137918150" duration="2452000" />
+      <workItem from="1648478345586" duration="596000" />
+      <workItem from="1648486175622" duration="716000" />
+      <workItem from="1648551644089" duration="1189000" />
+      <workItem from="1648673409948" duration="427000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <created>1646612648950</created>
@@ -246,7 +259,14 @@
       <option name="project" value="LOCAL" />
       <updated>1647877986227</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Server fixed, CoAP client - server pair functional for GET requests">
+      <created>1647878332501</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1647878332501</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -273,7 +293,8 @@
     <MESSAGE value="Switched style of imported modules to object-oriented. This allows each module to have a once run constructor and a run method." />
     <MESSAGE value="Restructure. Added parent client and translator classes and began creating protocol specific child classes. Currently, not functional, some asyncio issues with coap server. Running reproduces same error each time. Needs further research and understanding." />
     <MESSAGE value="Client now working to request temperature. Blank binary response returned, need to correct something server side." />
-    <option name="LAST_COMMIT_MESSAGE" value="Client now working to request temperature. Blank binary response returned, need to correct something server side." />
+    <MESSAGE value="Server fixed, CoAP client - server pair functional for GET requests" />
+    <option name="LAST_COMMIT_MESSAGE" value="Server fixed, CoAP client - server pair functional for GET requests" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Python$main_local.coverage" NAME="main_local Coverage Results" MODIFIED="1645757208154" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

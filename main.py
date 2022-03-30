@@ -4,16 +4,26 @@ import argparse
 from os.path import exists
 from sys import argv
 import asyncio
-# import paho
+import paho
 from aiocoap import Message, Context, Code, resource, error
 import aiocoap
 import socket
+import amqp
+from aiohttp import web
 from gpiozero import CPUTemperature
+import aiohttp
 
 
 def get_ip_address():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.connect(("192.168.0.10", 80))  # Forces it to find a valid route on the 192.168.0.0/24 subnet rather than the class A c2 subnet
+    try:
+        sock.connect(("192.168.0.10", 80))  # Forces it to find a valid route on the 192.168.0.0/24 subnet rather than the class A c2 subnet
+    except OSError as e:
+        print("Could not find a valid route on the 192.168.0/24 Network:")
+        print(e)
+        print("Quitting...")
+        quit(0)
+
     return sock.getsockname()[0]
 
 
@@ -23,12 +33,14 @@ class Temperature(resource.Resource):
         self.temperature = CPUTemperature()
 
     async def render_get(self, request):
-        payload = str(self.temperature.temperature).encode('ascii')
+        payload = self.getTemperature().encode('ascii')
         return Message(payload=payload)
 
     def render_put(self):
         raise error.MethodNotAllowed
 
+    def getTemperature(self):
+        return str(self.temperature.temperature)
 
 class Translator:
 
@@ -84,13 +96,17 @@ class AmqpTranslator(Translator):
 
 
 class HttpTranslator(Translator):
-    pass
+    def __init__(self, port=80):
+        super().__init__(port)
 
 
 class Client:
 
     def __init__(self, port):
         self.port = port
+
+    def request(self, method, dest_uri):
+        pass
 
 
 class CoapClient(Client):
@@ -122,19 +138,19 @@ class CoapClient(Client):
     async def RemoveResource(self, path):
         await self.site.remove_resource(path)
 
-    async def listenIndefinitely(self):
-        await asyncio.get_running_loop().create_future()
-
-    async def sendMessage(self, method, dest_uri):
+    async def request(self, method, dest_uri):
+        start_time = time.time()
         if method == "GET":
             request = Message(code=Code.GET, uri=dest_uri)
-            # try:
-            response = await self.protocol.request(request).response
-            # except Exception as e:
-            #     print('Failed to fetch resource:')
-            #     print(e)
-            # else:
-            print('Result: {}\n{}'.format(response.code, response.payload))
+            try:
+                response = await self.protocol.request(request).response
+            except Exception as e:
+                print('Failed to fetch resource:')
+                print(e)
+            else:
+                finishTime = time.time()
+                timesCoap.append(finishTime-start_time)
+                print('Result: {}\n{}'.format(response.code, response.payload))
         elif method == "POST":
             pass
         elif method == "PUT":
@@ -161,23 +177,95 @@ class AmqpClient(Client):
 
 
 class HttpClient(Client):
-    pass
+    def __init__(self, port=80):
+        super().__init__(port)
+
+    async def request(self, requestType, uri, payload=None):
+        async with aiohttp.ClientSession() as session:
+            if requestType.upper() == "GET":
+                startTime = time.time()
+                async with session.get(uri) as response:
+                    finishTime = time.time()
+                    timesHttp.append(finishTime-startTime)
+                    print(response.status)
+                    print(await response.text())
+            elif requestType.upper() == "POST":
+                async with session.post(uri, data=payload) as response:
+                    print(response.status)
+                    print(await response.text())
+            elif requestType.upper() == "PUT":
+                async with session.put(uri, data=payload) as response:
+                    print(response.status)
+                    print(await response.text())
+            elif requestType.upper() == "DELETE":
+                async with session.delete(uri) as response:
+                    print(response.status)
+                    print(await response.text())
+            elif requestType.upper() == "HEAD":
+                async with session.head(uri) as response:
+                    print(response.status)
+                    print(await response.text())
+            elif requestType.upper() == "OPTIONS":
+                async with session.options(uri) as response:
+                    print(response.status)
+                    print(await response.text())
+            elif requestType.upper() == "PATCH":
+                async with session.patch(uri, data=payload) as response:
+                    print(response.status)
+                    print(await response.text())
+
+
+class HttpServer(Client):
+
+    def __init__(self, port=80):
+        super().__init__(port)
+        self.site = None
+
+    @classmethod
+    async def create(cls, port=80):
+        self = HttpServer(port)
+        self.httpServer = web.Application()
+        self.httpServer.add_routes([web.get('/temp', self.handle_temperature)])
+        self.runner = web.AppRunner(self.httpServer)
+        await self.runner.setup()
+        self.site = web.TCPSite(self.runner, get_ip_address(), 80)
+        return self
+
+    async def handle_temperature(self, request):
+        return web.Response(text=str(temperature.getTemperature()))
+
+    async def run(self):
+        print("test - running http server")
+        await self.site.start()
+
+    def add_resource(self):
+        pass
 
 
 async def main():
+    # HTTP
+    httpClient = HttpClient()
+
+    httpServer = await HttpServer.create()
+    httpTranslator = HttpTranslator()
+    #await httpServer.run()
+    # CoAP
     siteRoot = resource.Site()
-    temp = Temperature()
-    siteRoot.add_resource(['temp'], temp)
+    siteRoot.add_resource(['temp'], temperature)
 
     coapClient = await CoapClient.create(site=siteRoot)
-
+    event_loop = asyncio.get_event_loop()
     # asyncio.run(coapClient.AddResource(temp, 'temp'))
     if args.x:
-        await coapClient.sendMessage('GET', 'coap://192.168.0.103/temp')
-        if debug:
-            print("Test")
+        for counter in range(1000):
+            await coapClient.request('GET', 'coap://192.168.0.103/temp')
+            await httpClient.request("GET", "http://192.168.0.103/temp")
+        print("Coap:\n{}".format(timesCoap))
+        print("Http:\n{}".format(timesHttp))
     else:
-        await asyncio.get_running_loop().create_future()
+        await asyncio.gather(asyncio.get_running_loop().create_future(), httpServer.run())
+
+
 # Set location for any default files
 defaultConfig = "config_client.json"
 
@@ -364,10 +452,8 @@ if translator and client:
 
 protocols = []
 
-#
-# if any([CoAP_Provide, MQTT_Provide, AMQP_Provide, HTTP_Provide]):
-#     provider = True
-#     from gpiozero import CPUTemperature
-#     temperature = CPUTemperature()
+temperature = Temperature()
+timesCoap = []
+timesHttp = []
 
 asyncio.run(main())
