@@ -1,0 +1,12 @@
+{
+  "destination": "10.0.10.4",
+  "source": "",
+  "onwardProtocol:": "AMQP",
+  "translator": "10.0.10.1",
+  "commands": [
+    "AMQPPublishStart",
+    "MQTTPublishStart"
+  ],
+  "content":"CPU Temperature: 55 Degrees Celsius",
+
+}

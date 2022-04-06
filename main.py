@@ -1,12 +1,13 @@
 import time
 import json
+import xml
 import argparse
 from os.path import exists
 from sys import argv
 import asyncio
-import paho
-from aiocoap import Message, Context, Code, resource, error
-import aiocoap
+import asyncio_mqtt
+from aiocoap import Context, Code, resource, error
+from aiocoap import Message as coapMessage
 import socket
 import aio_pika
 import aio_pika.abc
@@ -35,13 +36,71 @@ class Temperature(resource.Resource):
 
     async def render_get(self, request):
         payload = self.getTemperature().encode('ascii')
-        return Message(payload=payload)
+        return coapMessage(payload=payload)
 
     def render_put(self):
         raise error.MethodNotAllowed
 
     def getTemperature(self):
         return str(self.temperature.temperature)
+
+
+def writeMessage(content, destination, protocol, translator=None, commands=None):
+    messageDict = {"destination": destination, "onwardProtocol": protocol, "translator": translator, "content": content, "commands":commands}
+    message = json.dumps(messageDict)
+    return message
+    # self = IoTTMessage()
+    # if translator:
+    #     if translator == IP:
+    #         self.destination = destination
+    #     else:
+    #         self.destination = translator
+    # else:
+    #     self.destination = destination
+    # self.onwardProtocol = protocol
+
+class IoTTMessage:
+    def __init__(self):
+        pass
+
+
+
+
+    def read(self, message, sourceProtocol):
+        self = IoTTMessage()
+        self.sourceProtocol = sourceProtocol
+        fileType = self.extractFileType()
+        self.content = self.extractContent()
+        self.destination, self.source, self.onwardProtocol, originatingProtocol = self.extractMetadata()
+        self.commands = self.extractCommands()
+
+    def extractContent(self):
+        # TODO finish me
+        content = ""
+        return content
+
+    def extractFileType(self):
+        fileType = None
+        if self.sourceProtocol == "CoAP":
+            fileType = self.typeHint
+
+        return fileType
+
+    def extractMetadata(self):
+        # TODO finish me
+        destination = ""
+        source = ""
+        onwardProtocol = ""
+        originatingProtocol = ""
+        return destination, source, onwardProtocol, originatingProtocol
+
+    def extractCommands(self):
+        commands = []
+        if commands:
+            return commands
+        else:
+            return None
+
 
 class Translator:
 
@@ -63,7 +122,7 @@ class CoapTranslator(Translator):
 
     async def sendMessage(self, method, dest_uri):
         if method == "GET":
-            request = Message(code=Code.GET, uri=dest_uri)
+            request = coapMessage(code=Code.GET, uri=dest_uri)
             try:
                 response = await self.protocol.request(request).response
             except Exception as e:
@@ -121,12 +180,8 @@ class CoapClient(Client):
             self.site = site
         else:
             self.site = resource.Site()
-        self.protocol = await Context.create_server_context(self.site, bind=(get_ip_address(), self.port))
+        self.protocol = await Context.create_server_context(self.site, bind=(IP, self.port))
         return self
-
-    async def start(self):
-        self.protocol = await Context.create_server_context(self.site, bind=(get_ip_address(), self.port))
-        await asyncio.get_running_loop().create_future()
 
     def AddResource(self, new_resource, uri):
         self.site.add_resource(path=[uri], resource=new_resource)
@@ -139,7 +194,7 @@ class CoapClient(Client):
     async def request(self, method, dest_uri):
         start_time = time.time()
         if method == "GET":
-            request = Message(code=Code.GET, uri=dest_uri)
+            request = coapMessage(code=Code.GET, uri=dest_uri)
             try:
                 response = await self.protocol.request(request).response
             except Exception as e:
@@ -167,7 +222,42 @@ class CoapClient(Client):
 
 
 class MqttClient(Client):
-    pass
+    def __init__(self, port):
+        super().__init__(port)
+        self.client = None
+
+    @classmethod
+    async def create(cls, broker, port=1883):
+        self = MqttClient(port)
+        self.client = asyncio_mqtt.Client(hostname=broker, username="user", password="pass", port=port)
+        await self.client.connect()
+        print("Mqtt Client created")
+        return self
+
+    def request(self, method, dest_uri):
+        pass
+
+    async def publish(self, topic, payload):
+        await self.client.publish(topic, payload.encode())
+
+    async def subscribe(self, topic):
+        print("subscriber started")
+        async with self.client.filtered_messages(topic) as messages:
+            await self.client.subscribe(topic)
+            async for message in messages:
+                print("{} - MQTT".format(message.payload.decode()))
+
+    def addChannel(self, topic):
+        pass
+
+    def removeChannel(self, topic):
+        pass
+
+    def unsubscribe(self, topic):
+        pass
+
+    def close(self):
+        pass
 
 
 class AmqpClient(Client):
@@ -177,7 +267,7 @@ class AmqpClient(Client):
         self.connection = None
 
     @classmethod
-    async def create(cls, exchange, port=80):
+    async def create(cls, exchange, port=5672):
         self = AmqpClient(port)
         self.connection = await aio_pika.connect_robust(exchange)
 
@@ -197,6 +287,7 @@ class AmqpClient(Client):
         pass
 
     async def subscribe(self, queue_name):
+        print("subscriber started amqp")
         channel: aio_pika.abc.AbstractChannel = await self.connection.channel()
         queue: aio_pika.abc.AbstractQueue = await channel.declare_queue(queue_name, auto_delete=True)
 
@@ -264,7 +355,7 @@ class HttpServer(Client):
         self.httpServer.add_routes([web.get('/temp', self.handle_temperature)])
         self.runner = web.AppRunner(self.httpServer)
         await self.runner.setup()
-        self.site = web.TCPSite(self.runner, get_ip_address(), 80)
+        self.site = web.TCPSite(self.runner, IP, 80)
         return self
 
     async def handle_temperature(self, request):
@@ -276,6 +367,21 @@ class HttpServer(Client):
 
     def add_resource(self):
         pass
+
+
+async def runPublishLoop(pubSubClient):
+    print("loop started")
+    await asyncio.sleep(10)
+    for counter in range(10):
+        await pubSubClient.publish("temp", temperature.getTemperature())
+        print("publishing temperature")
+        await asyncio.sleep(5)
+
+
+async def processMessage(message: IoTTMessage):
+    if message.commands is not None and message.destination == IP:
+        for command in message.commands:
+            loop.create_task(command)
 
 
 async def main():
@@ -290,16 +396,15 @@ async def main():
     siteRoot.add_resource(['temp'], temperature)
 
     coapClient = await CoapClient.create(site=siteRoot)
-    event_loop = asyncio.get_event_loop()
-    # asyncio.run(coapClient.AddResource(temp, 'temp'))
+    # AMQP
+    amqpClient = await AmqpClient.create("amqp://user:pass@192.168.0.101/")
+    # MQTT
+    mqttClient = await MqttClient.create("192.168.0.101")
     if args.x:
-        for counter in range(1000):
-            await coapClient.request('GET', 'coap://192.168.0.103/temp')
-            await httpClient.request("GET", "http://192.168.0.103/temp")
-        print("Coap:\n{}".format(timesCoap))
-        print("Http:\n{}".format(timesHttp))
+        print(writeMessage(temperature.getTemperature(), "10.0.10.4", "AMQP", "10.0.10.1", ["EnableMQTTPublish 5 5"]))
+        # await asyncio.gather(amqpClient.subscribe("temp"), coapClient.request('GET', 'coap://192.168.0.101/temp'), httpClient.request("GET", "http://192.168.0.101/temp"), mqttClient.subscribe("temp"))
     else:
-        await asyncio.gather(asyncio.get_running_loop().create_future(), httpServer.run())
+        await asyncio.gather(asyncio.get_running_loop().create_future(), httpServer.run(), runPublishLoop(amqpClient), runPublishLoop(mqttClient))
 
 
 # Set location for any default files
@@ -487,9 +592,9 @@ if translator and client:
     quit(1)
 
 protocols = []
-
+IP = get_ip_address()
 temperature = Temperature()
 timesCoap = []
 timesHttp = []
-
+loop = asyncio.get_event_loop()
 asyncio.run(main())
