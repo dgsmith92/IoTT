@@ -1,5 +1,6 @@
 import time
 import json
+import weakref
 import xml
 import argparse
 from os.path import exists
@@ -49,6 +50,51 @@ def writeMessage(content, destination, onwardProtocol, translatorAddress=None, c
 def readMessage(jsonMessage):
     messageDict = json.loads(jsonMessage)
     return messageDict
+
+
+class messageProcessor:
+    def __init__(self, parent):
+        self.parent = weakref.ref(parent)
+
+    async def processMessage(self, payload):
+        message = readMessage(payload)
+        if message.get("destination") == IP:
+            if message.get("commands"):
+                for command in message.get("commands"):
+                    await loop.create_task(command)
+            print("{}".format(message.get("content")))
+            elapsedTime = message.get(
+                "sendTime") - time.time()  # TODO record elapsed time values  # TODO add send times to messages so that elapsed time can be calculated
+        if message.get("messageType") == "request":
+            if message.get("onwardProtocol") == "AMQP":
+                response = ""
+            elif message.get("onwardProtocol") == "MQTT":
+                response = ""
+            elif message.get("onwardProtocol") == "HTTP":
+                response = await self.parent.httpClient.request("GET", message.get("destination"),
+                                                                payload=message.get("content"))
+            elif message.get("onwardProtocol") == "CoAP":
+                response = await translators.get("CoAP").request(message)
+            else:
+                response = "--Error invalid onward protocol"
+                print(response)
+            return response
+        elif message.get("messageType") == "response":
+            if message.get("onwardProtocol") == "AMQP":
+                response = ""
+            elif message.get("onwardProtocol") == "MQTT":
+                response = ""
+            elif message.get("onwardProtocol") == "HTTP":
+                response = await self.parent.httpClient.request("GET", message.get("destination"), payload=payload)
+            elif message.get("onwardProtocol") == "CoAP":
+                response = await translators.get("CoAP").request(message)
+            else:
+                response = "--Error invalid onward protocol"
+                print(response)
+            return response
+        else:
+            response = "--Error invalid messageType in payload JSON"
+            print(response)
 
 
 class Temperature(resource.Resource):
@@ -113,9 +159,9 @@ class Translator:
         self.port = port
 
 
-class CoapTranslator(Translator):
+class CoapTranslator:
     def __init__(self, port):
-        super().__init__(port)
+        self.port = port
         self.site = resource.Site()
         self.protocol = Context.create_server_context(self.site)
 
@@ -152,34 +198,47 @@ class CoapTranslator(Translator):
         pass
 
 
-class MqttTranslator(Translator):
+class MqttTranslator:
     pass
 
 
-class AmqpTranslator(Translator):
+class AmqpTranslator:
     pass
 
 
-class HttpTranslator(Translator):
+class HttpTranslator:
     def __init__(self, port=80):
-        super().__init__(port)
+        self.port = port
 
 
 class Client:
 
-    def __init__(self, port):
+    def __init__(self, ports=None):
+        self.ports = ports
+
+    @classmethod
+    async def create(cls, ports):
+        self = Client(ports)
+        siteRoot = resource.Site()
+        siteRoot.add_resource(['temp'], temperature)
+        self.coapClient = await CoapClient.create(self, site=siteRoot)
+        self.mqttClient = await MqttClient.create(self, "192.168.0.101")
+        self.amqpClient = await AmqpClient.create(self, "amqp://user:pass@192.168.0.101/")
+        self.httpClient = HttpClient(self)
+        self.httpServer = await HttpServer.create(self)
+        return self
+
+
+class CoapClient(messageProcessor):
+    def __init__(self, parent, port=5683):
+        super().__init__(parent)
         self.port = port
-
-
-class CoapClient(Client):
-    def __init__(self, port=5683):
-        super().__init__(port)
         self.site = None
         self.protocol = None
 
     @classmethod
-    async def create(cls, port=5683, site=None):
-        self = CoapClient(port)
+    async def create(cls, parent, port=5683, site=None):
+        self = CoapClient(parent, port=port)
         self.protocol = None
         if site:
             self.site = site
@@ -208,7 +267,7 @@ class CoapClient(Client):
             else:
                 finishTime = time.time()
                 timesCoap.append(finishTime - start_time)
-                print('Result: {}\n{}'.format(response.code, response.payload))
+                await self.processMessage(response.payload)
         elif method == "POST":
             pass
         elif method == "PUT":
@@ -226,14 +285,15 @@ class CoapClient(Client):
         pass
 
 
-class MqttClient(Client):
-    def __init__(self, port):
-        super().__init__(port)
+class MqttClient(messageProcessor):
+    def __init__(self, parent, port):
+        self.parent = weakref.ref(parent)
+        self.port = port
         self.client = None
 
     @classmethod
-    async def create(cls, broker, port=1883):
-        self = MqttClient(port)
+    async def create(cls, parent, broker, port=1883):
+        self = MqttClient(parent, port=port)
         self.client = asyncio_mqtt.Client(hostname=broker, username="user", password="pass", port=port)
         await self.client.connect()
         print("Mqtt Client created")
@@ -265,15 +325,16 @@ class MqttClient(Client):
         pass
 
 
-class AmqpClient(Client):
+class AmqpClient(messageProcessor):
 
-    def __init__(self, port):
-        super().__init__(port)
+    def __init__(self, parent, port):
+        self.parent = weakref.ref(parent)
+        self.port = port
         self.connection = None
 
     @classmethod
-    async def create(cls, exchange, port=5672):
-        self = AmqpClient(port)
+    async def create(cls, parent, exchange, port=5672):
+        self = AmqpClient(parent, port=port)
         self.connection = await aio_pika.connect_robust(exchange)
 
         return self
@@ -308,9 +369,10 @@ class AmqpClient(Client):
         await self.connection.close()
 
 
-class HttpClient(Client):
-    def __init__(self, port=80):
-        super().__init__(port)
+class HttpClient(messageProcessor):
+    def __init__(self, parent, port=80):
+        self.parent = weakref.ref(parent)
+        self.port = port
 
     async def request(self, requestType, uri, payload=None):
         async with aiohttp.ClientSession() as session:
@@ -347,15 +409,16 @@ class HttpClient(Client):
                     print(await response.text())
 
 
-class HttpServer(Client):
+class HttpServer(messageProcessor):
 
-    def __init__(self, port=80):
-        super().__init__(port)
+    def __init__(self, parent, port=80):
+        self.parent = weakref.ref(parent)
+        self.port = port
         self.site = None
 
     @classmethod
-    async def create(cls, port=80):
-        self = HttpServer(port)
+    async def create(cls, parent, port=80):
+        self = HttpServer(parent, port=port)
         self.httpServer = web.Application()
         self.httpServer.add_routes([web.get('/temp', self.handle_temperature)])
         self.runner = web.AppRunner(self.httpServer)
@@ -383,55 +446,33 @@ async def runPublishLoop(pubSubClient):
         await asyncio.sleep(5)
 
 
-async def processMessage(message: dict):
-    if message.get("destination") == IP:
-        if message.get("commands"):
-            for command in message.get("commands"):
-                await loop.create_task(command)
-        print("{}".format(message.get("content")))
-        elapsedTime = message.get("sendTime") - time.time()  # TODO record elapsed time values  # TODO add send times to messages so that elapsed time can be calculated
-    else:
-        if message.get("onwardProtocol") == "AMQP":
-            response = ""
-        elif message.get("onwardProtocol") == "MQTT":
-            response = ""
-        elif message.get("onwardProtocol") == "HTTP":
-            response = ""
-        elif message.get("onwardProtocol") == "CoAP":
-            response = await translators.get("CoAP").request(message)
-        else:
-            print("--Error invalid onward protocol")
-            response = "--Error invalid onward protocol"
-
-        return response
-
-
 async def main():
-    # HTTP
-    httpClient = HttpClient()
-
-    httpServer = await HttpServer.create()
-    httpTranslator = HttpTranslator()
-    # await httpServer.run()
-    # CoAP
-    siteRoot = resource.Site()
-    siteRoot.add_resource(['temp'], temperature)
-
-    coapClient = await CoapClient.create(site=siteRoot)
-    # AMQP
-    amqpClient = await AmqpClient.create("amqp://user:pass@192.168.0.101/")
-    # MQTT
-    mqttClient = await MqttClient.create("192.168.0.101")
-    global translators
-    translators = {"CoAP": coapClient, "HTTP": httpClient, "MQTT": mqttClient, "AMQP": amqpClient}
+    # # HTTP
+    # httpClient = HttpClient()
+    #
+    # httpServer = await HttpServer.create()
+    # httpTranslator = HttpTranslator()
+    # # await httpServer.run()
+    # # CoAP
+    # siteRoot = resource.Site()
+    # siteRoot.add_resource(['temp'], temperature)
+    #
+    # coapClient = await CoapClient.create(site=siteRoot)
+    # # AMQP
+    # amqpClient = await AmqpClient.create("amqp://user:pass@192.168.0.101/")
+    # # MQTT
+    # mqttClient = await MqttClient.create("192.168.0.101")
+    IoTTClient = await Client.create()
 
     if args.x:
         print(writeMessage(temperature.getTemperature(), "10.0.10.4", "AMQP", "10.0.10.1", ["EnableMQTTPublish 5 5"]))
-        await asyncio.gather(amqpClient.subscribe("temp"), coapClient.request('GET', 'coap://192.168.0.101/temp'),
-                             httpClient.request("GET", "http://192.168.0.101/temp"), mqttClient.subscribe("temp"))
+        await asyncio.gather(IoTTClient.amqpClient.subscribe("temp"),
+                             IoTTClient.coapClient.request('GET', 'coap://192.168.0.101/temp'),
+                             IoTTClient.httpClient.request("GET", "http://192.168.0.101/temp"),
+                             IoTTClient.mqttClient.subscribe("temp"))
     else:
-        await asyncio.gather(asyncio.get_running_loop().create_future(), httpServer.run(), runPublishLoop(amqpClient),
-                             runPublishLoop(mqttClient))
+        await asyncio.gather(asyncio.get_running_loop().create_future(), IoTTClient.httpServer.run(),
+                             runPublishLoop(IoTTClient.amqpClient), runPublishLoop(IoTTClient.mqttClient))
 
 
 # Set location for any default files

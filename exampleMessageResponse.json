@@ -1,0 +1,10 @@
+{
+  "destination": "10.0.10.3",
+  "source": "10.0.10.4",
+  "onwardProtocol:": "CoAP",
+  "originatingProtocol": "AMQP",
+  "messageType": "response",
+  "translator": "10.0.10.1",
+  "commands": [],
+  "content": "52.93 Degrees Celsius"
+}
