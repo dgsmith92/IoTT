@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95e66a15-c946-4eef-a965-e5a5fc6b2ec1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/exampleMessageResponse.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/webServers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/webServers.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/exampleMessage.json" beforeDir="false" afterPath="$PROJECT_DIR$/exampleMessage.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -51,7 +48,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SONARLINT_PRECOMMIT_ANALYSIS" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/wheelhouse" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
@@ -62,7 +59,6 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="M:\Diss\Code\Python" />
       <recent name="M:\Diss\Code\Python\wheelhouse" />
       <recent name="C:\Users\danie\PycharmProjects\IoTT\translators" />
       <recent name="C:\Users\danie\PycharmProjects\IoTT\clients" />
@@ -205,7 +201,6 @@
       <workItem from="1649033435957" duration="596000" />
       <workItem from="1649080549982" duration="11141000" />
       <workItem from="1649253296743" duration="594000" />
-      <workItem from="1649343842615" duration="6408000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <created>1646612648950</created>

@@ -106,51 +106,70 @@ class Temperature(resource.Resource):
         payload = self.getTemperature().encode('ascii')
         return coapMessage(payload=payload)
 
-    def render_put(self):
+    async def render_put(self):
         raise error.MethodNotAllowed
 
     def getTemperature(self):
         return str(self.temperature.temperature)
 
 
-class IoTTMessage:
+class TranslatedCoAPResource(resource.Resource):
     def __init__(self):
-        pass
+        self.content = ""
+        self.updateContent()  # TODO Add logic to switch between content update mechanisms (req/res + pub/sub)
 
-    def read(self, message, sourceProtocol):
-        self = IoTTMessage()
-        self.sourceProtocol = sourceProtocol
-        fileType = self.extractFileType()
-        self.content = self.extractContent()
-        self.destination, self.source, self.onwardProtocol, originatingProtocol = self.extractMetadata()
-        self.commands = self.extractCommands()
+    def updateContent(self):
+        self.content = ""  # TODO update empty string to dynamically get content as influenced by constructor
 
-    def extractContent(self):
-        # TODO finish me
-        content = ""
-        return content
+    async def subscribe(self):
+        pass  # TODO add code to call a subscriber to dynamically update content
 
-    def extractFileType(self):
-        fileType = None
-        if self.sourceProtocol == "CoAP":
-            fileType = self.typeHint
+    async def render_get(self, request):
+        payload = processMessage(request)  # TODO get payload from endpoint
+        return coapMessage(payload=self.content)
 
-        return fileType
+    async def render_put(self):
+        raise error.MethodNotAllowed
 
-    def extractMetadata(self):
-        # TODO finish me
-        destination = ""
-        source = ""
-        onwardProtocol = ""
-        originatingProtocol = ""
-        return destination, source, onwardProtocol, originatingProtocol
 
-    def extractCommands(self):
-        commands = []
-        if commands:
-            return commands
-        else:
-            return None
+# class IoTTMessage:
+#     def __init__(self):
+#         pass
+#
+#     def read(self, message, sourceProtocol):
+#         self = IoTTMessage()
+#         self.sourceProtocol = sourceProtocol
+#         fileType = self.extractFileType()
+#         self.content = self.extractContent()
+#         self.destination, self.source, self.onwardProtocol, originatingProtocol = self.extractMetadata()
+#         self.commands = self.extractCommands()
+#
+#     def extractContent(self):
+#         # TODO finish me
+#         content = ""
+#         return content
+#
+#     def extractFileType(self):
+#         fileType = None
+#         if self.sourceProtocol == "CoAP":
+#             fileType = self.typeHint
+#
+#         return fileType
+#
+#     def extractMetadata(self):
+#         # TODO finish me
+#         destination = ""
+#         source = ""
+#         onwardProtocol = ""
+#         originatingProtocol = ""
+#         return destination, source, onwardProtocol, originatingProtocol
+#
+#     def extractCommands(self):
+#         commands = []
+#         if commands:
+#             return commands
+#         else:
+#             return None
 
 
 class Translator:
