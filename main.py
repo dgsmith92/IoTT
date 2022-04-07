@@ -19,7 +19,8 @@ import aiohttp
 def get_ip_address():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        sock.connect(("192.168.0.10", 80))  # Forces it to find a valid route on the 192.168.0.0/24 subnet rather than the class A c2 subnet
+        sock.connect(("192.168.0.10",
+                      80))  # Forces it to find a valid route on the 192.168.0.0/24 subnet rather than the class A c2 subnet
     except OSError as e:
         print("Could not find a valid route on the 192.168.0/24 Network:")
         print(e)
@@ -27,6 +28,27 @@ def get_ip_address():
         quit(0)
 
     return sock.getsockname()[0]
+
+
+def writeMessage(content, destination, onwardProtocol, translatorAddress=None, commands=None):
+    messageDict = {"destination": destination, "onwardProtocol": onwardProtocol, "translator": translatorAddress,
+                   "content": content, "commands": commands}
+    message = json.dumps(messageDict)
+    return message
+    # self = IoTTMessage()
+    # if translator:
+    #     if translator == IP:
+    #         self.destination = destination
+    #     else:
+    #         self.destination = translator
+    # else:
+    #     self.destination = destination
+    # self.onwardProtocol = protocol
+
+
+def readMessage(jsonMessage):
+    messageDict = json.loads(jsonMessage)
+    return messageDict
 
 
 class Temperature(resource.Resource):
@@ -45,26 +67,9 @@ class Temperature(resource.Resource):
         return str(self.temperature.temperature)
 
 
-def writeMessage(content, destination, protocol, translator=None, commands=None):
-    messageDict = {"destination": destination, "onwardProtocol": protocol, "translator": translator, "content": content, "commands":commands}
-    message = json.dumps(messageDict)
-    return message
-    # self = IoTTMessage()
-    # if translator:
-    #     if translator == IP:
-    #         self.destination = destination
-    #     else:
-    #         self.destination = translator
-    # else:
-    #     self.destination = destination
-    # self.onwardProtocol = protocol
-
 class IoTTMessage:
     def __init__(self):
         pass
-
-
-
 
     def read(self, message, sourceProtocol):
         self = IoTTMessage()
@@ -129,7 +134,7 @@ class CoapTranslator(Translator):
                 print('Failed to fetch resource:')
                 print(e)
             else:
-                print('Result: %s\n%r'%(response.code, response.payload))
+                print('Result: %s\n%r' % (response.code, response.payload))
         elif method == "POST":
             pass
         elif method == "PUT":
@@ -202,7 +207,7 @@ class CoapClient(Client):
                 print(e)
             else:
                 finishTime = time.time()
-                timesCoap.append(finishTime-start_time)
+                timesCoap.append(finishTime - start_time)
                 print('Result: {}\n{}'.format(response.code, response.payload))
         elif method == "POST":
             pass
@@ -313,7 +318,7 @@ class HttpClient(Client):
                 startTime = time.time()
                 async with session.get(uri) as response:
                     finishTime = time.time()
-                    timesHttp.append(finishTime-startTime)
+                    timesHttp.append(finishTime - startTime)
                     print(response.status)
                     print(await response.text())
             elif requestType.upper() == "POST":
@@ -372,16 +377,33 @@ class HttpServer(Client):
 async def runPublishLoop(pubSubClient):
     print("loop started")
     await asyncio.sleep(10)
-    for counter in range(10):
+    for _ in range(10):
         await pubSubClient.publish("temp", temperature.getTemperature())
         print("publishing temperature")
         await asyncio.sleep(5)
 
 
-async def processMessage(message: IoTTMessage):
-    if message.commands is not None and message.destination == IP:
-        for command in message.commands:
-            loop.create_task(command)
+async def processMessage(message: dict):
+    if message.get("destination") == IP:
+        if message.get("commands"):
+            for command in message.get("commands"):
+                await loop.create_task(command)
+        print("{}".format(message.get("content")))
+        elapsedTime = message.get("sendTime") - time.time()  # TODO record elapsed time values  # TODO add send times to messages so that elapsed time can be calculated
+    else:
+        if message.get("onwardProtocol") == "AMQP":
+            response = ""
+        elif message.get("onwardProtocol") == "MQTT":
+            response = ""
+        elif message.get("onwardProtocol") == "HTTP":
+            response = ""
+        elif message.get("onwardProtocol") == "CoAP":
+            response = await translators.get("CoAP").request(message)
+        else:
+            print("--Error invalid onward protocol")
+            response = "--Error invalid onward protocol"
+
+        return response
 
 
 async def main():
@@ -390,7 +412,7 @@ async def main():
 
     httpServer = await HttpServer.create()
     httpTranslator = HttpTranslator()
-    #await httpServer.run()
+    # await httpServer.run()
     # CoAP
     siteRoot = resource.Site()
     siteRoot.add_resource(['temp'], temperature)
@@ -400,11 +422,16 @@ async def main():
     amqpClient = await AmqpClient.create("amqp://user:pass@192.168.0.101/")
     # MQTT
     mqttClient = await MqttClient.create("192.168.0.101")
+    global translators
+    translators = {"CoAP": coapClient, "HTTP": httpClient, "MQTT": mqttClient, "AMQP": amqpClient}
+
     if args.x:
         print(writeMessage(temperature.getTemperature(), "10.0.10.4", "AMQP", "10.0.10.1", ["EnableMQTTPublish 5 5"]))
-        # await asyncio.gather(amqpClient.subscribe("temp"), coapClient.request('GET', 'coap://192.168.0.101/temp'), httpClient.request("GET", "http://192.168.0.101/temp"), mqttClient.subscribe("temp"))
+        await asyncio.gather(amqpClient.subscribe("temp"), coapClient.request('GET', 'coap://192.168.0.101/temp'),
+                             httpClient.request("GET", "http://192.168.0.101/temp"), mqttClient.subscribe("temp"))
     else:
-        await asyncio.gather(asyncio.get_running_loop().create_future(), httpServer.run(), runPublishLoop(amqpClient), runPublishLoop(mqttClient))
+        await asyncio.gather(asyncio.get_running_loop().create_future(), httpServer.run(), runPublishLoop(amqpClient),
+                             runPublishLoop(mqttClient))
 
 
 # Set location for any default files
@@ -473,7 +500,6 @@ MQTT_brokerAddress = ""
 AMQP_exchangeAddress = ""
 provider = False
 consumer = False
-
 
 if not (args.configFile or exists(defaultConfig)):
     print("-- No config specified and no default found. Using built in default --")
@@ -564,7 +590,8 @@ else:
                         HTTP_Provide = True
             else:
                 print('--WARNING\tInvalid Protocol name "{}" found in config file. Skipping this protocol. If this is '
-                      'unexpected check the configuration and consider restarting the program.'.format(protocol['name']))
+                      'unexpected check the configuration and consider restarting the program.'.format(
+                    protocol['name']))
     if role == "Client":
         client = True
     elif role == "Translator":
@@ -597,4 +624,5 @@ temperature = Temperature()
 timesCoap = []
 timesHttp = []
 loop = asyncio.get_event_loop()
+translators = {}
 asyncio.run(main())
