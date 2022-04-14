@@ -113,8 +113,9 @@ class Temperature(resource.Resource):
         return str(self.temperature.temperature)
 
 
-class TranslatedCoAPResource(resource.Resource):
+class TranslatedCoAPResource(messageProcessor, resource.Resource, messageProcessor):
     def __init__(self):
+        super().__init__()
         self.content = ""
         self.updateContent()  # TODO Add logic to switch between content update mechanisms (req/res + pub/sub)
 
@@ -125,7 +126,7 @@ class TranslatedCoAPResource(resource.Resource):
         pass  # TODO add code to call a subscriber to dynamically update content
 
     async def render_get(self, request):
-        payload = processMessage(request)  # TODO get payload from endpoint
+        self.content = await self.processMessage(request)  # TODO get payload from endpoint
         return coapMessage(payload=self.content)
 
     async def render_put(self):
