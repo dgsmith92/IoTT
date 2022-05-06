@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95e66a15-c946-4eef-a965-e5a5fc6b2ec1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -53,15 +53,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "WebServerToolWindowFactoryState": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="M:\Diss\Code\Python" />
@@ -209,7 +210,13 @@
       <workItem from="1649253296743" duration="594000" />
       <workItem from="1649343842615" duration="6408000" />
       <workItem from="1649771094892" duration="594000" />
-      <workItem from="1649882845217" duration="3779000" />
+      <workItem from="1649882845217" duration="4504000" />
+      <workItem from="1651421649096" duration="9597000" />
+      <workItem from="1651500839114" duration="2364000" />
+      <workItem from="1651539634686" duration="1875000" />
+      <workItem from="1651594115070" duration="3335000" />
+      <workItem from="1651703593651" duration="19389000" />
+      <workItem from="1651851016033" duration="594000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <created>1646612648950</created>
@@ -295,7 +302,14 @@
       <option name="project" value="LOCAL" />
       <updated>1648678638953</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Updated translated CoAP resource">
+      <created>1649897113605</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1649897113605</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -325,7 +339,8 @@
     <MESSAGE value="Server fixed, CoAP client - server pair functional for GET requests" />
     <MESSAGE value="Improved error handling, removed redundant commented out code" />
     <MESSAGE value="Added bulk of amqpClient class" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added bulk of amqpClient class" />
+    <MESSAGE value="Updated translated CoAP resource" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated translated CoAP resource" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Python$CoAP_directTest_clientGET.coverage" NAME="CoAP_directTest_clientGET Coverage Results" MODIFIED="1647223137119" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/translators" />
