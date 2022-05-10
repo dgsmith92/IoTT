@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95e66a15-c946-4eef-a965-e5a5fc6b2ec1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -216,7 +215,9 @@
       <workItem from="1651539634686" duration="1875000" />
       <workItem from="1651594115070" duration="3335000" />
       <workItem from="1651703593651" duration="19389000" />
-      <workItem from="1651851016033" duration="594000" />
+      <workItem from="1651851016033" duration="11425000" />
+      <workItem from="1652029981563" duration="15860000" />
+      <workItem from="1652136369275" duration="2806000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <created>1646612648950</created>
@@ -309,7 +310,14 @@
       <option name="project" value="LOCAL" />
       <updated>1649897113605</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Working CoAP to and from HTTP">
+      <created>1651877129296</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1651877129296</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -340,7 +348,8 @@
     <MESSAGE value="Improved error handling, removed redundant commented out code" />
     <MESSAGE value="Added bulk of amqpClient class" />
     <MESSAGE value="Updated translated CoAP resource" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated translated CoAP resource" />
+    <MESSAGE value="Working CoAP to and from HTTP" />
+    <option name="LAST_COMMIT_MESSAGE" value="Working CoAP to and from HTTP" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Python$CoAP_directTest_clientGET.coverage" NAME="CoAP_directTest_clientGET Coverage Results" MODIFIED="1647223137119" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/translators" />
