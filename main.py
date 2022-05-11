@@ -58,7 +58,10 @@ class messageProcessor:
         self.parent = weakref.proxy(parent)
 
     async def processMessage(self, payload):
-        payload = payload.decode()
+        if isinstance(payload, str):
+            pass
+        else:
+            payload = payload.decode()
         message = readMessage(payload)
 
         # print(message.get("content"))
@@ -160,6 +163,7 @@ class TranslatedCoAPResource(messageProcessor, resource.Resource):
 class IoTTSubscriber(messageProcessor):
     def __init__(self, parent, messageProtocol, topic):  # Requires a weakref proxy to reuse the already initialised pub/sub clients to create a subscriber
         super().__init__(parent)
+        self.publisher = None
         self.content = ""
         self.client = None
         self.topic = topic
@@ -176,9 +180,9 @@ class IoTTSubscriber(messageProcessor):
             self.amqp = False
 
     @classmethod
-    async def create(cls, parent, messageProtocol, topic):
+    async def create(cls, parent, messageProtocol, topic, publisher=None):
         self = IoTTSubscriber(parent, messageProtocol, topic)
-
+        self.publisher = publisher
         return self
 
     async def subscribe(self):
@@ -191,6 +195,8 @@ class IoTTSubscriber(messageProcessor):
                 await self.client.subscribe(self.topic)
                 async for message in messages:
                     self.content = message.payload.decode()
+                    if self.publisher:
+                        await self.publisher.publishOnce(self.content)
                     # print("Updated MQTT value to {}".format(self.content))
 
         if self.amqp:
@@ -203,6 +209,8 @@ class IoTTSubscriber(messageProcessor):
                 async for message in queue_iterator:
                     async with message.process():
                         self.content = message.body.decode()
+                        if self.publisher:
+                            await self.publisher.publishOnce(self.content)
                         # print("Updated AMQP value to {}".format(self.content))
 
     async def get_content_http(self, request):
@@ -211,10 +219,46 @@ class IoTTSubscriber(messageProcessor):
     async def get_content(self):
         return self.content
 
+    def addPublisher(self, publisher):
+        self.publisher = publisher
+
 
 class IoTTPublisher(messageProcessor):
-    def __init__(self):
-        pass
+    def __init__(self, parent, subscriber):
+        super().__init__(parent)
+        self.subscriber: IoTTSubscriber = subscriber
+
+    @classmethod
+    async def create(cls, parent, publisher, topic, subscriber=None, requestResource=None):
+        self = IoTTPublisher(parent, subscriber)
+        self.publisher = publisher
+        self.topic = topic
+
+        self.requestResource = requestResource
+        if subscriber and requestResource:
+            print("ERROR - IoTTPublisher created with a pub/sub and req/res resource. {}".format(subscriber))
+
+        elif not (subscriber or requestResource):
+            print("ERROR - IoTTPublisher has neither pub/sub or req/res resources assigned.")
+        return self
+
+    async def start(self):
+        if self.subscriber:
+            self.subscriber.addPublisher(self)
+            asyncio.create_task(self.subscriber.subscribe())
+        elif self.requestResource:
+            asyncio.create_task(self.publishLoop(self.requestResource))
+
+    async def publishOnce(self, payload):
+        await self.publisher.publish(self.topic, payload)
+
+    async def publishLoop(self, requestResource):
+        while True:
+            content = await requestResource.get("client").request("GET", requestResource.get("url"))
+            if isinstance(content, bytes):
+                content = content.decode()
+            await self.publishOnce(content)
+            await asyncio.sleep(0.1)
 
 # class IoTTMessage:
 #     def __init__(self):
@@ -269,6 +313,13 @@ class Translator:
         self.mqttClient = await MqttTranslator.create(self, "192.168.0.101")
         self.amqpClient = await AmqpTranslator.create(self, "amqp://user:pass@192.168.0.101/")
 
+        a_m_sub = await IoTTSubscriber.create(self, "amqp", "temp")
+        a_m_pub = await IoTTPublisher.create(self, self.mqttClient, "a_m_temp", subscriber=a_m_sub)
+        await a_m_pub.start()
+        m_a_sub = await IoTTSubscriber.create(self, "mqtt", "temp")
+        m_a_pub = await IoTTPublisher.create(self, self.amqpClient, "m_a_temp", subscriber=m_a_sub)
+        await m_a_pub.start()
+
         siteRoot = resource.Site()
         mqttSub = await IoTTSubscriber.create(self, "mqtt", "temp")
         asyncio.create_task(mqttSub.subscribe())
@@ -286,6 +337,17 @@ class Translator:
 
         self.httpClient = HttpClient(self)
         self.httpServer = await HttpTranslator.create(self)
+
+        c_a_pub = await IoTTPublisher.create(self, self.amqpClient, "c_a_temp", requestResource={"client": self.coapClient, "url": "coap://" + SERVER_ADDRESS + "/temp"})
+        await c_a_pub.start()
+        c_m_pub = await IoTTPublisher.create(self, self.mqttClient, "c_m_temp", requestResource={"client": self.coapClient, "url": "coap://" + SERVER_ADDRESS + "/temp"})
+        await c_m_pub.start()
+
+        h_a_pub = await IoTTPublisher.create(self, self.amqpClient, "h_a_temp", requestResource={"client": self.httpClient, "url": "http://" + SERVER_ADDRESS + "/temp"})
+        await h_a_pub.start()
+        h_m_pub = await IoTTPublisher.create(self, self.mqttClient, "h_m_temp", requestResource={"client": self.httpClient, "url": "http://" + SERVER_ADDRESS + "/temp"})
+        await h_m_pub.start()
+
         return self
 
     async def register_resource(self, response_protocol, uri):
@@ -391,7 +453,6 @@ class MqttTranslator(messageProcessor):
         pass
 
     async def publish(self, topic, payload):
-        payload = self.parent.coapClient.sendMessage("GET", ) + " MQTT"
         await self.client.publish(topic, payload.encode())
 
     async def subscribe(self, topic):
@@ -436,6 +497,7 @@ class AmqpTranslator(messageProcessor):
         channel: aio_pika.abc.AbstractChannel = await self.connection.channel()
         payload = payload + " AMQP"
         await channel.default_exchange.publish(aio_pika.Message(body=payload.encode()), routing_key=queue_name)
+        await channel.close()
 
     async def add_queue(self, queue_name):
         pass
@@ -452,6 +514,7 @@ class AmqpTranslator(messageProcessor):
             async for message in queue_iterator:
                 async with message.process():
                     print(message.body)
+
 
     def unsubscribe(self, queue_name):
         pass
@@ -504,6 +567,7 @@ class HttpTranslator(messageProcessor):
 
     async def service(self, request):
         return web.Response(text="This is a summy service message to increase server load")
+
     async def run(self):
         print("test - running http server")
         await self.site.start()
@@ -616,7 +680,8 @@ class MqttClient(messageProcessor):
         async with self.client.filtered_messages(topic) as messages:
             await self.client.subscribe(topic)
             async for message in messages:
-                self.parent.processMessage("{}".format(message.payload.decode()))
+                await self.processMessage(message.payload.decode())
+
 
 
 
@@ -670,7 +735,8 @@ class AmqpClient(messageProcessor):
         async with queue.iterator() as queue_iterator:
             async for message in queue_iterator:
                 async with message.process():
-                    print(message.body)
+                    print(message.body.decode())
+
 
     def unsubscribe(self, queue_name):
         pass
@@ -796,7 +862,12 @@ async def main():
         txt = await asyncio.gather(IoTTClient.coapClient.request('GET', 'coap://' + TRANSLATOR_ADDRESS + '/amqp'))
         await asyncio.sleep(0.1)
 
-
+        asyncio.create_task(IoTTClient.mqttClient.subscribe("a_m_temp"))
+        asyncio.create_task(IoTTClient.amqpClient.subscribe("m_a_temp"))
+        asyncio.create_task(IoTTClient.mqttClient.subscribe("c_m_temp"))
+        asyncio.create_task(IoTTClient.amqpClient.subscribe("c_a_temp"))
+        asyncio.create_task(IoTTClient.mqttClient.subscribe("h_m_temp"))
+        asyncio.create_task(IoTTClient.amqpClient.subscribe("h_a_temp"))
 
         addr = await IoTTClient.httpClient.request('PUT', "http://" + TRANSLATOR_ADDRESS + '/service/register_resource', payload="mqtt://" + SERVER_ADDRESS + "/temp")
         print(addr)
